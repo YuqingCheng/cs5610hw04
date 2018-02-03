@@ -2,20 +2,19 @@ defmodule Calc do
   def eval(line) do
     list = String.split(line, " ")
     vals = %{:toadd => 0.0, :totimes => 1.0, :func => fn x, y -> x * y end}
-    map = %{:vals => vals, :list => list :stack => []}
+    map = %{:vals => vals, :list => list, :stack => []}
     eval_list(map)
   end
 
   defp eval_list(map) do
     [h1 | t1] = map.list
-    plus = fn x, y => x + y
     func = map.vals.func
     toadd = map.vals.toadd
     totimes = map.vals.totimes
     new_vals = %{:toadd => 0.0, :totimes => 1.0, :func => fn x, y -> x * y end}
 
     cond do
-      is_open_paren h1 && is_close_paren h1 ->
+      is_open_paren(h1) && is_close_paren(h1) ->
         temp = String.slice(h1, 1, String.length(h1)-1)
         eval_list %{map | :list => [temp] ++ t1}
       is_open_paren h1 ->
@@ -23,16 +22,17 @@ defmodule Calc do
         eval_list %{:vals => new_vals, :list => [temp] ++ t1, :stack => [map.vals] ++ map.stack} 
       is_close_paren h1 ->
         temp = String.slice(h1, 0, String.length(h1)-1)
-        
-
+        [pop | stack] = map.stack
+        num = Float.parse(temp) |> elem(0)
+        head = pop.func.(pop.totimes, func.(totimes, num) + toadd) + pop.toadd
+        eval_list %{:vals => new_vals, :list => [head] ++ t1, :stack => stack}
       true ->
-        num = Float.parse(h1) |> elem(0)
-
+        num = parse(h1)
         if length(t1) == 0 do
           func.(totimes, num) + toadd
         else
           [h2 | t2] = t1
-          eval_list %{:vals => eval_operator(h2, map.vals, num), :list => t2, :paren => map.paren}
+          eval_list %{:vals => eval_operator(h2, map.vals, num), :list => t2, :stack => map.stack}
         end
     end    
   end
@@ -49,11 +49,27 @@ defmodule Calc do
     end
   end
 
-  defp eval_list_by_close_paren(list) do
-    
+  def is_open_paren(head) do
+    if is_float(head) do
+      false
+    else 
+      head =~ ~r/^\(/
+    end
   end
 
-  def is_open_paren(head) do
-    head =~ ~r/^\(/
+  def is_close_paren(head) do
+    if is_float(head) do
+      false
+    else 
+      head =~ ~r/\)$/
+    end
+  end
+
+  def parse num do
+    if is_float(num) do
+      num
+    else
+      Float.parse(num) |> elem(0)
+    end
   end
 end
