@@ -23,9 +23,12 @@ defmodule Calc do
       is_close_paren h1 ->
         temp = String.slice(h1, 0, String.length(h1)-1)
         [pop | stack] = map.stack
-        num = Float.parse(temp) |> elem(0)
+        tuple = Float.parse(temp)
+        num = elem(tuple, 0)
+        remain = elem(tuple, 1)
+
         head = pop.func.(pop.totimes, func.(totimes, num) + toadd) + pop.toadd
-        eval_list %{:vals => new_vals, :list => [head] ++ t1, :stack => stack}
+        eval_list %{:vals => new_vals, :list => [Float.to_string(head) <> remain] ++ t1, :stack => stack}
       true ->
         num = parse(h1)
         if length(t1) == 0 do
