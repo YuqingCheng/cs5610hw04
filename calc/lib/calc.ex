@@ -6,6 +6,17 @@ defmodule Calc do
     eval_list(map)
   end
 
+  def main do
+    read()
+  end
+
+  defp read do
+    input = IO.gets("> ")
+    str = String.slice(input, 0, String.length(input)-1)
+    IO.puts eval(str)
+    read()
+  end
+
   defp eval_list(map) do
     [h1 | t1] = map.list
     func = map.vals.func
@@ -21,17 +32,16 @@ defmodule Calc do
       is_open_paren h1 ->
         temp = String.slice(h1, 1, String.length(h1))
         eval_list %{:vals => new_vals, :list => [temp] ++ t1, :stack => [map.vals] ++ map.stack} 
-        
+
       is_close_paren h1 ->
         if length(map.stack) == 0 do
-          wrong_input
+          wrong_input()
         else
           temp = String.slice(h1, 0, String.length(h1)-1)
           [pop | stack] = map.stack
           tuple = Float.parse(temp)
           num = elem(tuple, 0)
           remain = elem(tuple, 1)
-
           head = pop.func.(pop.totimes, func.(totimes, num) + toadd) + pop.toadd
           eval_list %{:vals => new_vals, :list => [Float.to_string(head) <> remain] ++ t1, :stack => stack}
         end
@@ -40,7 +50,7 @@ defmodule Calc do
         num = parse(h1)
         if length(t1) == 0 do
           if length(map.stack) > 0 do
-            wrong_input
+            wrong_input()
           else
             func.(totimes, num) + toadd
           end
@@ -63,7 +73,7 @@ defmodule Calc do
     end
   end
 
-  def is_open_paren(head) do
+  defp is_open_paren(head) do
     if is_float(head) do
       false
     else 
@@ -71,7 +81,7 @@ defmodule Calc do
     end
   end
 
-  def is_close_paren(head) do
+  defp is_close_paren(head) do
     if is_float(head) do
       false
     else 
@@ -79,7 +89,7 @@ defmodule Calc do
     end
   end
 
-  def parse num do
+  defp parse num do
     if is_float(num) do
       num
     else
@@ -87,7 +97,7 @@ defmodule Calc do
     end
   end
 
-  def wrong_input do
+  defp wrong_input do
     "wrong input"
   end
 end
