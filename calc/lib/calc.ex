@@ -25,10 +25,6 @@ defmodule Calc do
     new_vals = %{:toadd => 0.0, :totimes => 1.0, :func => fn x, y -> x * y end}
 
     cond do
-      is_open_paren(h1) && is_close_paren(h1) ->
-        temp = String.slice(h1, 1, String.length(h1)-1)
-        eval_list %{map | :list => [temp] ++ t1}
-
       is_open_paren h1 ->
         temp = String.slice(h1, 1, String.length(h1))
         eval_list %{:vals => new_vals, :list => [temp] ++ t1, :stack => [map.vals] ++ map.stack} 
@@ -39,11 +35,10 @@ defmodule Calc do
         else
           temp = String.slice(h1, 0, String.length(h1)-1)
           [pop | stack] = map.stack
-          tuple = Float.parse(temp)
-          num = elem(tuple, 0)
-          remain = elem(tuple, 1)
-          head = pop.func.(pop.totimes, func.(totimes, num) + toadd) + pop.toadd
-          eval_list %{:vals => new_vals, :list => [Float.to_string(head) <> remain] ++ t1, :stack => stack}
+          {num, remain} = Float.parse(temp)
+          head = func.(totimes, num) + toadd
+
+          eval_list %{:vals => pop, :list => [Float.to_string(head) <> remain] ++ t1, :stack => stack}
         end
         
       true ->
