@@ -60,6 +60,48 @@ defmodule CalcTest do
     assert Calc.eval("(((1 + 3)))") == 4.0
   end
 
+  test "(3 * (2 + 5 * ((1 + 2) / 2))" do
+    assert Calc.eval("(3 * (2 + 5 * ((1 + 2) / 2))") == "wrong input"
+  end
+
+  test "((3 * (2 + 5 * ((1 + 2) / 2)))" do
+    assert Calc.eval("((3 * (2 + 5 * ((1 + 2) / 2)))") == "wrong input"
+  end
+
+  test "(3" do
+    assert Calc.eval("(3") == "wrong input"
+  end
+
+  test "3)" do
+    assert Calc.eval("3)") == "wrong input"
+  end
+
+  test "*" do
+    assert Calc.eval("*") == "wrong input"
+  end
+
+  test "3 +" do
+    assert Calc.eval("3 +") == "wrong input"
+  end
+
+  test "+ 3 * 5" do
+    assert Calc.eval("+ 3 * 5") == "wrong input"
+  end
+
+  test "()" do
+    assert Calc.eval("()") == "wrong input"
+  end
+
+  test "a + b" do
+    assert Calc.eval("a + b") == "wrong input"
+  end
+
+  test "3 plus 2" do
+    assert Calc.eval("3 plus 2") == "wrong input"
+  end
+
+
+
 
 
 
