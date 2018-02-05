@@ -39,7 +39,7 @@ defmodule Calc do
             temp = String.slice(h1, 0, String.length(h1)-1)
             [pop | stack] = map.stack
             {num, remain} = parse(temp)
-            if num == :wrong_input do
+            if num == :wrong_input || check_divide_zero(func, num) do
               wrong_input()
             else
               head = func.(totimes, num) + toadd
@@ -48,8 +48,8 @@ defmodule Calc do
           end
           
         true ->
-          {num, remain} = parse(h1)
-          if num == :wrong_input do
+          {num, _} = parse(h1)
+          if num == :wrong_input || check_divide_zero(func, num) do
             wrong_input()
           else
             if length(t1) == 0 do
@@ -63,7 +63,12 @@ defmodule Calc do
               if h2 != "+" && h2 != "-" && h2 != "*" && h2 != "/" do
                 wrong_input()
               else
-                eval_list %{:vals => eval_operator(h2, map.vals, num), :list => t2, :stack => map.stack}
+                vals = eval_operator(h2, map.vals, num)
+                if vals == :wrong_input do
+                  wrong_input()
+                else
+                  eval_list %{:vals => vals, :list => t2, :stack => map.stack}
+                end
               end
             end
           end       
@@ -118,6 +123,10 @@ defmodule Calc do
         end  
       end
     end
+  end
+
+  defp check_divide_zero(func, num) do
+    func.(2, 2) == 1 && num == 0.0
   end
 
   defp wrong_input do

@@ -100,6 +100,14 @@ defmodule CalcTest do
     assert Calc.eval("3 plus 2") == "wrong input"
   end
 
+  test "(3 * 2 + (5 * (1 - 2)))" do
+    assert Calc.eval("(3 * 2 + (5 * (1 - 2)))") == 1.0
+  end
+
+  test "1 / 0" do
+    assert Calc.eval("1 / 0") == "wrong input"
+  end
+
 
 
 
