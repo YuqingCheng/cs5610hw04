@@ -22,9 +22,7 @@ defmodule Calc do
       wrong_input()
     else
       [h1 | t1] = map.list
-      func = map.vals.func
-      toadd = map.vals.toadd
-      totimes = map.vals.totimes
+      [func, toadd, totimes] = [map.vals.func, map.vals.toadd, map.vals.totimes]
       new_vals = %{:toadd => 0.0, :totimes => 1.0, :func => fn x, y -> x * y end}
 
       cond do
@@ -53,20 +51,16 @@ defmodule Calc do
             wrong_input()
           else
             if length(t1) == 0 do
-              if length(map.stack) > 0 do
-                wrong_input()
-              else
-                func.(totimes, num) + toadd
-              end
+              if length(map.stack) > 0, do: wrong_input(), else: func.(totimes, num) + toadd
             else
               [h2 | t2] = t1
               if h2 != "+" && h2 != "-" && h2 != "*" && h2 != "/" do
                 wrong_input()
               else
                 vals = eval_operator(h2, map.vals, num)
-                if vals == :wrong_input do
+                if vals == :wrong_input do 
                   wrong_input()
-                else
+                else 
                   eval_list %{:vals => vals, :list => t2, :stack => map.stack}
                 end
               end
@@ -104,7 +98,7 @@ defmodule Calc do
     end
   end
 
-  def parse num do
+  defp parse num do
     if is_float(num) do
       {num, ""}
     else
